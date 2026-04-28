@@ -1,0 +1,10 @@
+uvicorn
+fastapi[standard]
+sqlalchemy
+asyncpg
+alembic
+pymysql
+passlib[bcrypt] 
+python-jose[cryptography]
+aiomysql
+bcrypt==4.0.1

@@ -1,0 +1,46 @@
+📊 Load Test Result – Login API (Initial Findings) A
+🧪 Test Setup
+Endpoint: POST /auth/login
+Users simulated: 100 → 200 concurrent users
+Duration: ~130 seconds
+Total requests: 38
+Errors: 0%
+📉 Results Summary
+Throughput: ~0.3 requests/second
+Average latency: ~3.3 seconds
+p95 latency: ~5.4 seconds
+p99 latency: ~5.5 seconds
+No failures, but system is very slow
+⚠️ Key Observation
+Increasing users from 100 to 200 did not increase requests
+System stayed at the same throughput (~38 requests total)
+🧠 Interpretation
+
+The system is not scaling with concurrency.
+
+This indicates a hard bottleneck in the backend.
+
+Most likely causes:
+
+CPU-heavy password hashing (bcrypt)
+Single worker process in FastAPI
+Blocking operations in login flow
+Database query + auth processing running sequentially
+🔥 Main Problem
+
+The login API is CPU-bound, not request-bound.
+
+Even with more users:
+
+requests are queued
+processing speed does not increase
+system hits a throughput ceiling
+📌 Conclusion
+System is stable (no errors)
+But performance is very slow under load
+Current architecture cannot handle concurrent login requests efficiently
+🚀 Next Optimization Steps
+Run FastAPI with multiple workers
+Optimize authentication flow (bcrypt is slow by design)
+Tune database indexing for email lookup
+Re-run load test to compare improvements
