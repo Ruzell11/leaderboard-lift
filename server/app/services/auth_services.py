@@ -9,6 +9,7 @@ from app.repositories.token_repository import (
 )
 from app.utils.hash import hash_password, verify_password
 from app.utils.jwt import create_access_token, create_refresh_token, decode_access_token
+from server.app.schemas.auth import AuthRequest
 
 
 def _token_response(user_id: str, refresh_token: str) -> dict:
@@ -20,13 +21,13 @@ def _token_response(user_id: str, refresh_token: str) -> dict:
 
 
 # ✅ SIGNUP
-async def signup_user(db: AsyncSession, email: str, password: str):
-    existing_user = await get_user_by_email(db, email)
+async def signup_user(db: AsyncSession, body: AuthRequest):
+    existing_user = await get_user_by_email(db, body.email)
     if existing_user:
         raise Exception("Email already registered")
 
-    hashed_password = hash_password(password)
-    user = await create_user(db, email, hashed_password)
+    hashed_password = hash_password(body.password)
+    user = await create_user(db, body.email, hashed_password)
 
     refresh_token = create_refresh_token()
     await save_refresh_token(db, str(user.id), refresh_token)
@@ -35,10 +36,10 @@ async def signup_user(db: AsyncSession, email: str, password: str):
 
 
 # ✅ LOGIN
-async def login_user(db: AsyncSession, email: str, password: str):
-    user = await get_user_by_email(db, email)
+async def login_user(db: AsyncSession, body: AuthRequest):
+    user = await get_user_by_email(db, body.email)
 
-    if not user or not verify_password(password, user.password):
+    if not user or not verify_password(body.password, user.password):
         raise Exception("Invalid credentials")
 
     refresh_token = create_refresh_token()
