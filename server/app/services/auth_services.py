@@ -9,7 +9,7 @@ from app.repositories.token_repository import (
 )
 from app.utils.hash import hash_password, verify_password
 from app.utils.jwt import create_access_token, create_refresh_token, decode_access_token
-from server.app.schemas.auth import AuthRequest
+from app.schemas.auth import AuthRequest
 
 
 def _token_response(user_id: str, refresh_token: str) -> dict:
