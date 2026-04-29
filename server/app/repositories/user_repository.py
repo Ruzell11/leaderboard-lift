@@ -35,3 +35,10 @@ async def create_user(
     await db.refresh(new_user)
 
     return new_user
+
+
+async def get_all_users(db: AsyncSession) -> list[User]:
+    result = await db.execute(
+        select(User)
+    )
+    return result.scalars().all()

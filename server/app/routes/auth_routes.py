@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from app.core.database import get_db
 from app.controller.auth_controller import signup_controller, login_controller, refresh_controller, logout_controller
 from app.schemas.auth import  AuthRequest, RefreshRequest
+
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
