@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from app.models.user import User
 
 
@@ -37,8 +37,43 @@ async def create_user(
     return new_user
 
 
+# 📄 Get all users
 async def get_all_users(db: AsyncSession) -> list[User]:
-    result = await db.execute(
-        select(User)
-    )
+    result = await db.execute(select(User))
     return result.scalars().all()
+
+
+# ✏️ Update user
+async def update_user(
+    db: AsyncSession,
+    user_id: int,
+    email: str | None = None,
+    password: str | None = None
+) -> User | None:
+    user = await get_user_by_id(db, user_id)
+
+    if not user:
+        return None
+
+    if email:
+        user.email = email
+    if password:
+        user.password = password
+
+    await db.commit()
+    await db.refresh(user)
+
+    return user
+
+
+# ❌ Delete user
+async def delete_user(db: AsyncSession, user_id: int) -> bool:
+    user = await get_user_by_id(db, user_id)
+
+    if not user:
+        return False
+
+    await db.delete(user)
+    await db.commit()
+
+    return True
